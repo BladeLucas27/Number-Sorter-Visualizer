@@ -144,19 +144,19 @@ namespace SortingAlgorithms
             await Task.Delay(TimeSpan.FromSeconds(1.5));        //pauses for 1.5 seconds to show current state
             pi = i + 1;
         }
-        static void swap(int[] arr, int i, int j)
+        static void swap(int[] array, int i, int j)
         {
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
+            int temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
         }
-        async Task quickSort(int[] arr, int low, int high, TextBox txtDisplay)
+        async Task quickSort(int[] array, int low, int high, TextBox txtDisplay)
         {
             if (low < high)
             {
-                await partition(arr, low, high, txtDisplay);
-                await quickSort(arr, low, pi - 1, txtDisplay);
-                await quickSort(arr, pi + 1, high, txtDisplay);
+                await partition(array, low, high, txtDisplay);
+                await quickSort(array, low, pi - 1, txtDisplay);
+                await quickSort(array, pi + 1, high, txtDisplay);
             }
         }
     }
@@ -180,7 +180,7 @@ namespace SortingAlgorithms
             int size = array.Length;
             txtDisplay.Text = string.Join(" | ", array);
             await Task.Delay(TimeSpan.FromSeconds(1.5));        //pauses for 1.5 seconds to show current state
-
+            
             txtFinished.Text = "Finished!";
         }
     }
@@ -193,6 +193,28 @@ namespace SortingAlgorithms
             txtDisplay.Text = string.Join(" | ", array);
             await Task.Delay(TimeSpan.FromSeconds(1.5));        //pauses for 1.5 seconds to show current state
 
+            // Start with a large gap, then reduce it step by step
+            for (int gap = size / 2; gap > 0; gap /= 2)
+            {
+                // Perform a "gapped" insertion sort for this gap size
+                for (int i = gap; i < size; i++)
+                {
+                    // Current element to be placed correctly
+                    int temp = array[i];
+                    int j = i;
+
+                    // Shift earlier elements that are greater than temp
+                    while (j >= gap && array[j - gap] > temp)
+                    {
+                        array[j] = array[j - gap];
+                        j -= gap;
+                    }
+                    // Place temp in its correct position
+                    array[j] = temp;
+                    txtDisplay.Text = string.Join(" | ", array);
+                    await Task.Delay(TimeSpan.FromSeconds(1.5));        //pauses for 1.5 seconds to show current state
+                }
+            }
             txtFinished.Text = "Finished!";
         }
     }
