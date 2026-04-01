@@ -227,7 +227,85 @@ namespace SortingAlgorithms
             txtDisplay.Text = string.Join(" | ", array);
             await Task.Delay(TimeSpan.FromSeconds(1.5));        //pauses for 1.5 seconds to show current state
 
+            int left = 0, right = size - 1, middle = left + (right - left) / 2;
+
+            await SortHalf(array, left, middle, txtDisplay, txtFinished);       // Sort first and second halves
+            txtDisplay.Text = string.Join(" | ", array);
+            await Task.Delay(TimeSpan.FromSeconds(1.5));        //pauses for 1.5 seconds to show current state
+
+            await SortHalf(array, middle + 1, right, txtDisplay, txtFinished);
+            txtDisplay.Text = string.Join(" | ", array);
+            await Task.Delay(TimeSpan.FromSeconds(1.5));        //pauses for 1.5 seconds to show current state
+            
+            merge(array, left, middle, right);                  // Merge the sorted halves
+
+            txtDisplay.Text = string.Join(" | ", array);
             txtFinished.Text = "Finished!";
+        }
+        public async Task SortHalf(int[] array, int left, int right, TextBox txtDisplay, TextBox txtFinished)
+        {
+            if (left < right)
+            {
+                int middle = left + (right - left) / 2;                             // Find the middle point
+
+                await SortHalf(array, left, middle, txtDisplay, txtFinished);       // Sorts first and second halves
+                txtDisplay.Text = string.Join(" | ", array);
+                await Task.Delay(TimeSpan.FromSeconds(0.5));        //pauses for .5 seconds to show current state
+                await SortHalf(array, middle + 1, right, txtDisplay, txtFinished);
+                txtDisplay.Text = string.Join(" | ", array);
+                await Task.Delay(TimeSpan.FromSeconds(0.5));        //pauses for .5 seconds to show current state
+
+                merge(array, left, middle, right);                  // Merges the sorted halves
+                txtDisplay.Text = string.Join(" | ", array);
+                await Task.Delay(TimeSpan.FromSeconds(0.5));        //pauses for .5 seconds to show current state
+            }
+        }
+        static void merge(int[] arr, int left, int middle, int right)
+        {
+            int n1 = middle - left + 1;
+            int n2 = right - middle;
+
+            int[] L = new int[n1];                  // Temp arrays for sorting
+            int[] R = new int[n2];
+            int i, j;
+
+            for (i = 0; i < n1; ++i)                // Copy data to temp arrays
+                L[i] = arr[left + i];   
+            for (j = 0; j < n2; ++j)
+                R[j] = arr[middle + 1 + j];
+
+            i = 0;
+            j = 0;
+            
+            int k = left;                           // Initial index of merged subarray array
+            while (i < n1 && j < n2)
+            {
+                if (L[i] <= R[j])
+                {
+                    arr[k] = L[i];
+                    i++;
+                }
+                else
+                {
+                    arr[k] = R[j];
+                    j++;
+                }
+                k++;
+            }
+            
+            while (i < n1)                          // Copy remaining elements of L[] if any
+            {
+                arr[k] = L[i];
+                i++;
+                k++;
+            }
+            
+            while (j < n2)                          // Copy remaining elements of R[] if any
+            {
+                arr[k] = R[j];
+                j++;
+                k++;
+            }
         }
     }
     internal class RadixSort
@@ -239,7 +317,62 @@ namespace SortingAlgorithms
             txtDisplay.Text = string.Join(" | ", array);
             await Task.Delay(TimeSpan.FromSeconds(1.5));        //pauses for 1.5 seconds to show current state
 
+            int m = getMax(array, size);
+
+            for (int exp = 1; m / exp > 0; exp *= 10) {
+                await digitSort(array, size, exp, txtDisplay);                    //sorts by each digit, starting with least significant digit
+                txtDisplay.Text = string.Join(" | ", array);
+                await Task.Delay(TimeSpan.FromSeconds(1.5));
+            }
+            txtDisplay.Text = string.Join(" | ", array);
             txtFinished.Text = "Finished!";
+        }
+        public async Task digitSort(int[] array, int size, int exp, TextBox txtDisplay)
+        {
+            int[] output = new int[size]; // output array
+            int i;
+            int[] count = new int[10];
+
+            // initializing all elements of count to 0
+            for (i = 0; i < 10; i++)
+                count[i] = 0;
+
+            // Store count of occurrences in count[]
+            for (i = 0; i < size; i++)
+            {
+                count[(array[i] / exp) % 10]++;
+            }
+
+            // Change count[i] so that count[i] now contains actual position of this digit in output[]
+            for (i = 1; i < 10; i++)
+            {
+                count[i] += count[i - 1];
+            }
+                
+
+            // Build the output array
+            for (i = size - 1; i >= 0; i--)
+            {
+                output[count[(array[i] / exp) % 10] - 1] = array[i];
+                count[(array[i] / exp) % 10]--;
+            }
+
+            // Copy the output array to arr[], so that arr[] now contains sorted numbers according to current digit
+            for (i = 0; i < size; i++)
+            {
+                array[i] = output[i];
+                txtDisplay.Text = string.Join(" | ", array);
+                await Task.Delay(TimeSpan.FromSeconds(0.5));        //pauses for .5 seconds to show current state
+            }
+            
+        }
+        public static int getMax(int[] array, int n)
+        {
+            int mx = array[0];
+            for (int i = 1; i < n; i++)
+                if (array[i] > mx)
+                    mx = array[i];
+            return mx;
         }
     }
     internal class CountingSort
@@ -251,6 +384,41 @@ namespace SortingAlgorithms
             txtDisplay.Text = string.Join(" | ", array);
             await Task.Delay(TimeSpan.FromSeconds(1.5));        //pauses for 1.5 seconds to show current state
 
+            int maxVal = array[0];
+            foreach (int v in array)                            //finds highest value in array to determine size of counting array
+            {
+                if (v > maxVal)
+                    maxVal = v;
+            }
+
+            int[] cntArray = new int[maxVal + 1];                 //cntArray used to count frequency of each value in array, size is maxVal + 1 to account for 0 index
+            for (int i = 0; i <= maxVal; i++)
+            {
+                cntArray[i] = 0;
+            }
+
+            foreach (int v in array)                            // count frequency for each element in array
+            {
+                cntArray[v]++;
+            }
+
+            // prefix sums
+            for (int i = 1; i <= maxVal; i++)
+            {
+                cntArray[i] += cntArray[i - 1];
+            }
+
+            // build output
+            int[] sorted = new int[size];
+            for (int i = size - 1; i >= 0; i--)
+            {
+                int v = array[i];
+                sorted[cntArray[v] - 1] = v;
+                cntArray[v]--;
+                txtDisplay.Text = string.Join(" | ", sorted);
+                await Task.Delay(TimeSpan.FromSeconds(0.5));        //pauses for 0.5 seconds to show current state
+            }
+            txtDisplay.Text = string.Join(" | ", sorted);
             txtFinished.Text = "Finished!";
         }
     }

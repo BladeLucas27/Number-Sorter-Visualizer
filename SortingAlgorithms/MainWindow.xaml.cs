@@ -91,8 +91,8 @@ namespace SortingAlgorithms
             }
             else if (sortOption == "Radix Sort")
             {
-                RandomQuickSort randomquickSort = new RandomQuickSort();
-                randomquickSort.Sort(sortArray, txtDisplay, txtFinished);
+                RadixSort radixSort = new RadixSort();
+                radixSort.Sort(sortArray, txtDisplay, txtFinished);
             }
             else if (sortOption == "Counting Sort")
             {
