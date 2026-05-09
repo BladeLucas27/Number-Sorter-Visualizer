@@ -47,57 +47,57 @@ namespace SortingAlgorithms
             if (sortOption == "Bubble Sort")
             {
                 BubbleSort bubbleSort = new BubbleSort();
-                bubbleSort.Sort(sortArray, txtDisplay, txtFinished);
+                bubbleSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Insertion Sort")
             {
                 InsertionSort insertionSort = new InsertionSort();
-                insertionSort.Sort(sortArray, txtDisplay, txtFinished);
+                insertionSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Selection Sort (Highest)")
             {
                 SelectionHighSort selectionhighSort = new SelectionHighSort();
-                selectionhighSort.Sort(sortArray, txtDisplay, txtFinished);
+                selectionhighSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Selection Sort (Lowest)")
             {
                 SelectionLowSort selectionlowSort = new SelectionLowSort();
-                selectionlowSort.Sort(sortArray, txtDisplay, txtFinished);
+                selectionlowSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Quick Sort")
             {
                 QuickSort quickSort = new QuickSort();
-                quickSort.Sort(sortArray, txtDisplay, txtFinished);
+                quickSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Random Quick Sort")
             {
                 RandomQuickSort randomquickSort = new RandomQuickSort();
-                randomquickSort.Sort(sortArray, txtDisplay, txtFinished);
+                randomquickSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Heap Sort")
             {
                 HeapSort heapSort = new HeapSort();
-                heapSort.Sort(sortArray, txtDisplay, txtFinished);
+                heapSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Shell Sort")
             {
                 ShellSort shellSort = new ShellSort();
-                shellSort.Sort(sortArray, txtDisplay, txtFinished);
+                shellSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Merge Sort")
             {
                 MergeSort mergeSort = new MergeSort();
-                mergeSort.Sort(sortArray, txtDisplay, txtFinished);
+                mergeSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Radix Sort")
             {
                 RadixSort radixSort = new RadixSort();
-                radixSort.Sort(sortArray, txtDisplay, txtFinished);
+                radixSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
             else if (sortOption == "Counting Sort")
             {
                 CountingSort countingSort = new CountingSort();
-                countingSort.Sort(sortArray, txtDisplay, txtFinished);
+                countingSort.Sort(sortArray, txtDisplay, txtFinished, barCanvas, sortArray.Length);
             }
         }
         private void CreateArray()
@@ -121,6 +121,41 @@ namespace SortingAlgorithms
             for (int i = 0; i < arraySize; i++)
             {
                 sortArray[i] = int.Parse(inputArray[i]);
+            }
+            DrawBars(sortArray);
+        }
+
+        private void DrawBars(int[] array)
+        {
+            barCanvas.Children.Clear();
+            
+            // Get parent border dimensions
+            Border parentBorder = (Border)barCanvas.Parent;
+            double canvasWidth = parentBorder.ActualWidth;
+            double canvasHeight = parentBorder.ActualHeight;
+            
+            if (canvasWidth <= 0 || canvasHeight <= 0)
+            {
+                return; // Canvas not yet rendered
+            }
+            
+            double barWidth = canvasWidth / array.Length;
+            int maxValue = array.Max();
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                double barHeight = (array[i] / (double)maxValue) * canvasHeight;
+                Rectangle bar = new Rectangle
+                {
+                    Width = barWidth - 2,
+                    Height = barHeight,
+                    Fill = new SolidColorBrush(Colors.SteelBlue),
+                    Stroke = new SolidColorBrush(Colors.Black),
+                    StrokeThickness = 1
+                };
+                Canvas.SetLeft(bar, i * barWidth);
+                Canvas.SetTop(bar, canvasHeight - barHeight);
+                barCanvas.Children.Add(bar);
             }
         }
     }
